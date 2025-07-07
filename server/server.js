@@ -1,7 +1,12 @@
-express = require('express')
-const app = express()
+import express from 'express';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import { prismaClient } from '@prisma/client';
+
+dotenv.config();
+
+const app = express();
 const path = require('path')
-const PORT = process.env.PORT || 3500
 
 app.use('/', express.static(path.join(__dirname, 'public')))
 
@@ -20,4 +25,5 @@ app.use((req, res) => {
     }
 })
 
+const PORT = process.env.PORT || 3500;
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`))

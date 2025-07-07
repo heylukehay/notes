@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  username  String    @unique
+  password  String
+  employee  Employee?
+  notes     Note[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model Employee {
+  id        Int       @id @default(autoincrement())
+  firstName String
+  lastName  String
+  role      Role      @default(EMPLOYEE)
+  userId    Int       @unique
+  user      User      @relation(fields: [userId], references: [id])
+  team      Team[]    @relation("EmployeeTeams")
+  managerOf Team[]    @relation("TeamManager")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model Team {
+  id        Int        @id @default(autoincrement())
+  name      String
+  managerId Int
+  manager   Employee   @relation("TeamManager", fields: [managerId], references: [id])
+  employees Employee[] @relation("EmployeeTeams")
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  deletedAt DateTime?
+}
+
+model Note {
+  id        Int       @id @default(autoincrement())
+  title     String
+  content   String
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+enum Role {
+  EMPLOYEE
+  MANAGER
+  ADMIN
+}
